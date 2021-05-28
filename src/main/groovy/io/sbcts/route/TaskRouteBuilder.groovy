@@ -22,9 +22,9 @@ class TaskRouteBuilder extends RouteBuilder {
     public void configure() throws Exception {
 
         onException(RuntimeException.class)
-                .log(LoggingLevel.ERROR,'Failed task:${body}')
-                .handled(false)
-                .setBody().groovy("['task':request.body.task,'state':'FAILED','body':request.body]")
+                .log(LoggingLevel.ERROR,'Failed task:${body.task}')
+                .handled(true)
+                .setBody().groovy("['task':request.body.task,'state':'FAILED']")
                 .bean('taskStateService','logStateAndNotify')
 
         configureTaskLoadBalancer()
@@ -189,7 +189,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .to(endpoints.split(','))
                 .end()
                 .log(LoggingLevel.INFO,"Ended task sequence:${taskHandle}")
-                .setBody().groovy("['task':'${taskHandle}','state':'SUCCESS']")
+                .setBody().groovy("['task':'${taskHandle}','state':body.find{it.state =='FAILED'}?'FAILED':'SUCCESS']")
                 .bean('taskStateService','logStateAndNotify')
 
         configureTaskRestEndpoint(taskHandle)
@@ -214,7 +214,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .to(endpoints.split(','))
                 .end()
                 .log(LoggingLevel.INFO,"Ended task set:${taskHandle}")
-                .setBody().groovy("['task':'${taskHandle}','state':'SUCCESS']")
+                .setBody().groovy("['task':'${taskHandle}','state':body.find{it.state =='FAILED'}?'FAILED':'SUCCESS']")
                 .bean('taskStateService','logStateAndNotify')
 
         configureTaskRestEndpoint(taskHandle)
