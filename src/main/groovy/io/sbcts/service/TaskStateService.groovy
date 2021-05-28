@@ -20,7 +20,6 @@ class TaskStateService {
     @Autowired protected Environment environment;
     @Autowired private NotificationService notificationService
 
-    @Value('${server.context}') private String context;
     @Value('${server.task.execution.history.size:10}') private int stateQueueSize;
     @Autowired private ProducerTemplate producer;
 

@@ -11,12 +11,10 @@ import org.springframework.stereotype.Component
 @Profile('load-balance-test')
 class LoadBalacingCheckRouteBuilder extends RouteBuilder {
 
-    @Value('${server.context}') private String context;
-
     @Override
     public void configure() throws Exception {
 
-         from("master:job-server-${context}:timer:timer1?period=2000&repeatCount=25")
+         from("master:job-server:timer:timer1?period=2000&repeatCount=25")
         .routeId("Periodic Add to Distributed Queue")
                 .setBody().groovy("System.currentTimeMillis()")
                 .log('Put On Queue -> ${body}')

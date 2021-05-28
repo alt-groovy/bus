@@ -14,7 +14,6 @@ class TaskRouteBuilder extends RouteBuilder {
     @Autowired
     protected TaskService taskService;
 
-    @Value('${server.context}') private String context;
     @Value('${server.task.schedules.enabled:false}') private boolean taskSchedulesEnabled;
     @Value('${camel.component.jms.request-timeout:3600000}') private long taskTimeout;
 
@@ -36,15 +35,15 @@ class TaskRouteBuilder extends RouteBuilder {
 
     public void configureTaskLoadBalancer(){
 
-        from("jms:${context}-load-balancer?concurrentConsumers=100&requestTimeout=${taskTimeout}")
-                .routeId("${context}-load-balancer-consumer")
+        from("jms:load-balancer?concurrentConsumers=100&requestTimeout=${taskTimeout}")
+                .routeId("load-balancer-consumer")
                 .log('Received load balanced task request for:${body[task]}')
                 .toD('direct:${body[task]}-local')
     }
 
     public void configureTaskSynchroniser(){
-        from("jms:${context}-synchroniser?concurrentConsumers=1&replyToConcurrentConsumers=1")
-                .routeId("${context}-synchroniser-consumer")
+        from("jms:synchroniser?concurrentConsumers=1&replyToConcurrentConsumers=1")
+                .routeId("synchroniser-consumer")
                 .log('Received synchronised task request for:${body[task]}')
                 .toD('direct:${body[task]}-local')
     }
@@ -91,7 +90,7 @@ class TaskRouteBuilder extends RouteBuilder {
     }
 
     public void configureLeaderElectedRoute(String fromUri, String toUri){
-        from("master:task-server-${context}:${fromUri}")
+        from("master:task-server:${fromUri}")
                 .to(toUri)
     }
 
@@ -136,7 +135,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO,"Load balancing task request for:${taskHandle}")
                 .setBody().groovy("['task':'${taskHandle}','state':'LOAD_BALANCING']")
                 .bean('taskStateService','logStateAndNotify')
-                .to("jms:${context}-load-balancer?exchangePattern=InOut&requestTimeout=${taskTimeout}")
+                .to("jms:load-balancer?exchangePattern=InOut&requestTimeout=${taskTimeout}")
                 .log(LoggingLevel.INFO,'Task request returned:${body}')
 
         configureLocalTask(taskHandle,taskDefinition)
@@ -149,7 +148,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO,"Synchronising task request for:${taskHandle}")
                 .setBody().groovy("['task':'${taskHandle}','state':'SYNCHRONISING']")
                 .bean('taskStateService','logStateAndNotify')
-                .to("jms:${context}-synchroniser?exchangePattern=InOut&requestTimeout=${taskTimeout}&synchronous=true")
+                .to("jms:synchroniser?exchangePattern=InOut&requestTimeout=${taskTimeout}&synchronous=true")
                 .log(LoggingLevel.INFO,'Task request returned:${body}')
 
         configureLocalTask(taskHandle,taskDefinition)
@@ -176,7 +175,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO,"Sending task sequence request for:${taskHandle}")
                 .setBody().groovy("['task':'${taskHandle}','state':'LOAD_BALANCING']")
                 .bean('taskStateService','logStateAndNotify')
-                .to("jms:${context}-load-balancer?exchangePattern=InOut")
+                .to("jms:load-balancer?exchangePattern=InOut")
                 .log(LoggingLevel.INFO,'Task sequence returned:${body}')
 
         from("direct:${taskHandle}-local")
@@ -202,7 +201,7 @@ class TaskRouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO,"Sending task set request for:${taskHandle}")
                 .setBody().groovy("['task':'${taskHandle}','state':'LOAD_BALANCING']")
                 .bean('taskStateService','logStateAndNotify')
-                .to("jms:${context}-load-balancer?exchangePattern=InOut")
+                .to("jms:load-balancer?exchangePattern=InOut")
 
         from("direct:${taskHandle}-local")
                 .routeId("${taskHandle}-local")
@@ -223,7 +222,7 @@ class TaskRouteBuilder extends RouteBuilder {
 
     public void configureLeaderElectedTaskSchedule(String taskHandle, String cronTab){
         String cronTabBase64 = Base64.getUrlEncoder().encodeToString(cronTab.getBytes())
-        from("master:task-server-${context}:quartz:${context}-${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
+        from("master:task-server-:quartz:${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
                 .routeId("${taskHandle} schedule ${cronTab}")
                 .autoStartup(taskSchedulesEnabled)
                 .setBody().constant(taskHandle)
@@ -231,12 +230,12 @@ class TaskRouteBuilder extends RouteBuilder {
                 .log(LoggingLevel.INFO,"Triggering scheduled task :${taskHandle}")
                 .setBody().groovy("['task':'${taskHandle}','state':'SCHEDULED','body':request.body]")
                 .bean('taskStateService','logStateAndNotify')
-                .to("seda:${context}-${taskHandle}-schedule-${cronTabBase64}")
+                .to("seda:${taskHandle}-schedule-${cronTabBase64}")
         .otherwise()
                 .log(LoggingLevel.INFO,"Skipping triggering of scheduled task :${taskHandle} is active")
         .end()
 
-        from("seda:${context}-${taskHandle}-schedule-${cronTabBase64}?exchangePattern=InOnly")
+        from("seda:${taskHandle}-schedule-${cronTabBase64}?exchangePattern=InOnly")
                 .routeId("${taskHandle} schedule ${cronTab} InOnly")
                 .to("direct://${taskHandle}")
     }
