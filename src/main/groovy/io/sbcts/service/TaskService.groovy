@@ -18,8 +18,6 @@ class TaskService {
     @Autowired protected Environment environment;
     @Autowired protected TaskStateService taskStateService
 
-    @Value('${server.context}') private String context;
-
     public Map getApplicationProperties (){
         Map<String, Object> properties = new HashMap();
         for(Iterator it = environment.getPropertySources().iterator(); it.hasNext(); ) {
