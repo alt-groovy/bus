@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top" th:fragment="nav-top">
+    <a class="navbar-brand" href="#" v-on:click="selectRoot()">Task Server</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li v-for="(job,index) in taskCrumbList.length" class="nav-item" v-if="(index > taskCrumbList.length - 4)">
+                <a class="nav-link" href="#" v-on:click="selectJob(index)">{{taskCrumbList[index].name}}<span v-if="(index < taskCrumbList.length-1)"> > </span></a>
+            </li>
+        </ul>
+
+
+        <form class="form-inline my-2 my-lg-0">
+            <a href="/actuator/hawtio" class="btn btn-secondary my-2 my-sm-0" type="button" data-toggle="tooltip" data-placement="bottom" title="Admin"><i class="fas fa-cog" aria-hidden="true"></i></a>&nbsp;
+        </form>
+        <form class="form-inline my-2 my-lg-0" action="/logout" method="post">
+            <button class="btn btn-secondary my-2 my-sm-0" type="submit" data-toggle="tooltip" data-placement="bottom" title="Sign Out"><i class="fa fa-sign-out-alt" aria-hidden="true" ></i></button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>

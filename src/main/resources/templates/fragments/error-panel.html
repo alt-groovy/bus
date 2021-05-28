@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+
+    <div class="fade" v-if="error" v-bind:class="{'alert alert-danger alert-dismissible show': error != ''}" role="alert" th:fragment="error-panel">
+        <h3>Error: {{error.response.body.status}}</h3><p>{{error.response.body.error}}</p>
+        <button type="button" class="close" v-on:click="clearError"aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+
+</body>

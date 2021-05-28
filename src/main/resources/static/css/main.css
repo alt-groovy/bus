@@ -1,0 +1,139 @@
+
+@media (min-width: 1600px){
+    .container {
+        max-width: 2600px;
+    }
+}
+
+body {
+    /*padding-top: 5rem;*/
+    font-family: Roboto !important;
+}
+
+.container {
+    width: 100%;
+    padding-right: 2px;
+    padding-left: 2px;
+    margin-right: 2px;
+    margin-left: 2px;
+}
+
+#lead-jumbotron {
+    color: #000;
+    /*background: #fff url("/images/brand/banner-CathedralGorge.jpg") center center;!*slide.jpg =>you image*!*/
+    background-repeat: no-repeat;
+    background-size:cover
+}
+
+.jumbotron h1 {
+    font-size: 4.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+}
+
+.jumbotron  {
+    font-size: 18px !important;
+    line-height: 24px !important;
+    font-weight: 300 !important;
+    border-radius: 0rem;
+    background-color: #fff;
+    padding-left: 4rem;
+    padding-right: 4rem;
+    padding-top: 4rem;
+}
+
+.size-input {
+    max-width: 3em;
+}
+
+.dropdown-menu{
+    font-family: Roboto !important;
+    font-size:1em;
+}
+
+.dropdown a{
+     color: black;
+ }
+
+#spinner {
+    margin-right: .5em;
+    width: 2rem;
+}
+
+/*.dropdown-item .disabled {*/
+/*    color: lightgrey !important;*/
+/*}*/
+
+.alert-primary {
+      background-color: #fbd4b9;
+      border-color: #ff9f00;
+      color: #b44010;
+  }
+
+.text-cancelled {
+    color: #ff9f00;!important;
+}
+
+#toasts {
+    z-index:100;
+}
+
+.toast-body {
+    /*min-width: 100em;*/
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: #212529;
+}
+
+.nav-link {
+    color: #212529;
+}
+
+#tabs-list {
+    /*padding-bottom: 20px;*/
+    /*border-bottom: none;*/
+}
+
+#tabcontent {
+    width:90%;
+    padding-left: 1rem;
+    /*border-left: 1px solid;*/
+}
+
+.footer {
+    background-color: whitesmoke;
+    z-index: 200;
+}
+
+#footer-container {
+    padding-left:0px;
+    padding-right:0px;
+    margin-left:0px;
+    margin-right:0px;
+}
+
+#footer-text-left {
+    padding-top: 1rem;
+    padding-left:2rem;
+}
+
+#footer-text-left a {
+    color: #2b2d2f;
+}
+
+#footer-text-center{
+    color: #2b2d2f;
+    padding-top: 1rem;
+    padding-right:2rem;
+}
+
+#footer-text-right {
+    padding-top: 1rem;
+    padding-right:2rem;
+}
+
+#footer-text-right a {
+    color: #2b2d2f;
+}

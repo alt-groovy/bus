@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Task Server">
+    <meta name="author" content="Craig Parravicini">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel='stylesheet' id='google-font-css'  href='https://fonts.googleapis.com/css?family=Roboto%3A300%2C400%2C600%7CRoboto&#038;ver=1.0' type='text/css' media='all' />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/typeaheadjs.css">
+
+
+    <title>Task Server</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=Array.from,Promise,Symbol,Object.setPrototypeOf,Object.getOwnPropertySymbols"></script>
+    <script src="https://cdn.jsdelivr.net/npm/superagent"></script>
+    <script src="https://kit.fontawesome.com/10808f8e76.js" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+    <div id="app">
+
+        <nav th:replace="fragments/nav-top :: nav-top"></nav>
+
+        <main>
+            <div class="jumbotron">
+                <div class="container">
+
+<!--                    <div th:replace="fragments/error-panel :: error-panel"></div>-->
+<!--                    <h3>{{selectedTask.name}}</h3>-->
+                    <div class="row">
+                    <div class="col">
+
+                        <div class="card-deck">
+
+                            <div v-if="taskMap != null && selectedTask != null && selectedTask.children != null" v-for="task in selectedTask.children" v-bind:key="task.name" class="card" v-bind:class="{'border-success': ('SUCCESS' == taskMap[task.name].statelist[0].state), 'border-danger': 'FAILED' == taskMap[task.name].statelist[0].state }">
+                                <div class=" card-header dropdown" v-on:dblclick="drillDownTask(task)">
+                                    <a  class="dropdown-toggle" href="#" data-toggle="dropdown">{{task.name}}</a>
+                                    <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                                        <a href="#" class="dropdown-item small" v-bind:class="{disabled: (taskMap[task.name].type == 'label')}" v-on:click="runTask(task.name)">Run Task</a>
+                                    </div>
+                                </div>
+                                <div class="card-body" >
+<!--                                    <h5 class="card-title" v-on:dblclick="drillDownTask(task)">{{task.name}}</h5>-->
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].type == 'task'" data-toggle="tooltip" data-placement="right" title="Talend Task">Task</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].type == 'synchronised'" data-toggle="tooltip" data-placement="right" title="Task runs exclusively">Synchronised Task</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].type == 'sequence'" data-toggle="tooltip" data-placement="right" title="Tasks run synchronously in order">Task Sequence</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].type == 'set'" data-toggle="tooltip" data-placement="right" title="Tasks run in parallel">Task Set</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].type == 'label'" data-toggle="tooltip" data-placement="right" title="A named group of tasks for navigation only">Task Label Group</h6>
+                                    <h6 class="card-subtitle text-muted">&nbsp</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].schedules.length > 0" data-toggle="tooltip" data-placement="right" title="Talend Task">Schedules</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].schedules.length > 0">&nbsp</h6>
+                                    <ul class="list-group list-group-flush"  v-if="taskMap[task.name].schedules.length > 0">
+                                        <li class="list-group-item" v-for="schedule in taskMap[task.name].schedules">{{schedule}}</li>
+                                    </ul>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[task.name].schedules.length > 0">&nbsp</h6>
+                                    <div v-if="task.children.length > 0" class="list-group">
+                                        <button v-for="child in task.children" v-bind:key="child.name" type="button" class="list-group-item list-group-item-action" v-on:dblclick="drillDownChildTask(task, child)">{{child.name}}</button>
+                                    </div>
+<!--                                    <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>-->
+
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">{{taskMap[task.name].statelist[0].state}}</small>
+                                </div>
+                            </div>
+
+                            <div v-if="taskMap != null && selectedTask != null && selectedTask.children != null && selectedTask.children.length == 0" class="card">
+
+                                <div class=" card-header dropdown" >
+                                    <a  class="dropdown-toggle" href="#" data-toggle="dropdown">{{selectedTask.name}}</a>
+                                    <div class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu">
+                                        <a href="#" class="dropdown-item small" v-bind:class="{disabled: (taskMap[selectedTask.name].type == 'label')}" v-on:click="runTask(selectedTask.name)">Run Task</a>
+                                    </div>
+                                </div>
+
+                                <div class="card-body" v-bind:class="{'border-success': 'SUCCESS' == taskMap[selectedTask.name].statelist[0].state, 'border-danger': 'FAILED' == taskMap[selectedTask.name].statelist[0].state}">
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].type == 'task'" data-toggle="tooltip" data-placement="right" title="Talend Task">Task</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].type == 'synchronised'" data-toggle="tooltip" data-placement="right" title="Task runs exclusively">Synchronised Task</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].type == 'sequence'" data-toggle="tooltip" data-placement="right" title="Tasks run synchronously in order">Task Sequence</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].type == 'set'" data-toggle="tooltip" data-placement="right" title="Tasks run in parallel">Task Set</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].type == 'label'" data-toggle="tooltip" data-placement="right" title="A named group of tasks for navigation only">Task Label Group</h6>
+                                    <h6 class="card-subtitle text-muted">&nbsp</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].schedules.length > 0" data-toggle="tooltip" data-placement="right" title="Talend Task">Schedules</h6>
+                                    <h6 class="card-subtitle text-muted" v-if="taskMap[selectedTask.name].schedules.length > 0">&nbsp</h6>
+                                    <ul class="list-group list-group-flush"  v-if="taskMap[selectedTask.name].schedules.length > 0">
+                                        <li class="list-group-item" v-for="schedule in taskMap[selectedTask.name].schedules">{{schedule}}</li>
+                                    </ul>
+
+                                </div>
+                                <div class="card-footer">
+                                    <small class="text-muted">{{taskMap[selectedTask.name].statelist[0].state}}</small>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </main>
+
+        <footer class="footer fixed-bottom">
+            <div id ="footer-container" class="container">
+                <div class="row">
+                    <div class="col-4">
+                        <p id="footer-text-left" class="text-muted text-left"><a href="https://github.com/craigparra/springboot-camel-task-server" target="_blank"><i class="fab fa-github"></i> README.md</a></p>
+                    </div>
+                    <div class="col-4">
+                    </div>
+                    <div class="col-4">
+                        <p id="footer-text-right" class="text-muted text-right"><a href="#"  target="_blank"><i class="fab fa-jenkins"></i> Build ({{buildNumber}}), {{moment(buildTime).format('MMMM Do YYYY, h:mm:ss a')}}</a></p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
+
+
+    <script src="js/moment-with-locales.js"></script>
+    <script src="js/moment-timezone-with-data.js"></script>
+    <script src="js/typeahead.bundle.min.js"></script>
+    <script src="js/lodash.min.js"></script>
+    <script src="js/sockjs.min.js"></script>
+    <script src="js/stomp.min.js"></script>
+
+    <script  src="js/taskTree.js"></script>
+    <script  src="js/main.js"></script>
+
+</body>
+</html>
