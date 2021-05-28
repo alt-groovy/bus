@@ -25,7 +25,7 @@ class TaskRouteBuilder extends RouteBuilder {
         onException(RuntimeException.class)
                 .log(LoggingLevel.ERROR,'Failed task:${body}')
                 .handled(false)
-                .setBody().groovy("['task':request.body.task,'state':'FAIL','body':request.body]")
+                .setBody().groovy("['task':request.body.task,'state':'FAILED','body':request.body]")
                 .bean('taskStateService','logStateAndNotify')
 
         configureTaskLoadBalancer()

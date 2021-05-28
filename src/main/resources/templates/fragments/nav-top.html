@@ -11,8 +11,8 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">
-            <li v-for="(job,index) in taskCrumbList.length" class="nav-item" v-if="(index > taskCrumbList.length - 4)">
-                <a class="nav-link" href="#" v-on:click="selectJob(index)">{{taskCrumbList[index].name}}<span v-if="(index < taskCrumbList.length-1)"> > </span></a>
+            <li v-for="(task,index) in taskCrumbList.length" class="nav-item" v-if="(index > taskCrumbList.length - 4)">
+                <a class="nav-link" href="#" v-on:click="selectTask(index)">{{taskCrumbList[index].name}}<span v-if="(index < taskCrumbList.length-1)"> > </span></a>
             </li>
         </ul>
 
