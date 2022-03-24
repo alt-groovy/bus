@@ -1,0 +1,5 @@
+#!/bin/bash
+set -x #echo on
+minikube -p skaffold start
+skaffold config set --global local-cluster true
+eval $(minikube -p skaffold docker-env)

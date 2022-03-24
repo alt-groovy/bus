@@ -1,0 +1,4 @@
+#!/bin/bash
+echo 'To set Skaffold to use minikube''s Docker daemon, run:'
+echo 'eval $(minikube -p skaffold docker-env)'
+echo 'env | sort | grep DOCKER'

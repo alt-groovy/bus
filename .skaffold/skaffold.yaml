@@ -1,0 +1,17 @@
+apiVersion: skaffold/v2beta24
+kind: Config
+metadata:
+  name: alt-groovy/bus
+profiles:
+  - name: local
+    activation:
+      - kubeContext: minikube
+        command: dev,run
+
+build:
+  tagPolicy:
+    gitCommit: { }
+  artifacts:
+    - image: alt-groovy/bus
+      docker:
+        dockerfile: .docker/Dockerfile

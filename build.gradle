@@ -8,7 +8,7 @@ plugins {
 group 'io.sbcts'
 version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.17
 
 configurations {
     developmentOnly
@@ -24,13 +24,13 @@ repositories {
 }
 
 dependencies {
-    compile 'org.codehaus.groovy:groovy-all:3.0.4'
-    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.9'
+    implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    compile group: 'org.springframework.security', name: 'spring-security-ldap', version: '5.3.1.RELEASE'
+    implementation group: 'org.springframework.security', name: 'spring-security-ldap', version: '5.3.1.RELEASE'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.2'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
