@@ -15,3 +15,13 @@ build:
     - image: alt-groovy/bus
       docker:
         dockerfile: .docker/Dockerfile
+deploy:
+  kubectl:
+    manifests:
+      - .skaffold/manifests/local.yaml
+portForward:
+  - resourceType: pod
+    resourceName: bus
+    namespace: default
+    port: 9091
+    localPort: 9091

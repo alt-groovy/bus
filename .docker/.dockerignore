@@ -1,0 +1,7 @@
+.skaffold/
+.gitlab/
+.github/
+.gradle/
+bin/
+build/
+gradle/

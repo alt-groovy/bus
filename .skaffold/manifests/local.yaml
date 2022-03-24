@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bus
+spec:
+  containers:
+    - name: bus
+      image: alt-groovy/bus
+      ports:
+        - containerPort: 9091

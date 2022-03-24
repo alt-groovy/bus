@@ -5,8 +5,8 @@ plugins {
     id 'java'
 }
 
-group 'io.sbcts'
-version '1.0-SNAPSHOT'
+group 'io.github.alt-groovy'
+version '1.0.0'
 
 sourceCompatibility = 1.17
 
