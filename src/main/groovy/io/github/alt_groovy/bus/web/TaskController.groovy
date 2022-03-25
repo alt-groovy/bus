@@ -1,6 +1,6 @@
-package io.sbcts.web
+package io.github.alt_groovy.bus.web
 
-import io.sbcts.service.TaskService
+import io.github.alt_groovy.bus.service.TaskService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 

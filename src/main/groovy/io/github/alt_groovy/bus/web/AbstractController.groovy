@@ -1,4 +1,4 @@
-package io.sbcts.web
+package io.github.alt_groovy.bus.web
 
 import org.springframework.http.HttpStatus
 

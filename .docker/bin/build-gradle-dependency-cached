@@ -1,0 +1,1 @@
+docker build -f .docker/Dockerfile-gradle-7.4.1-jdk11-alpine-dependency-cached -t gradle/dependency-cached:latest .

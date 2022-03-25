@@ -1,6 +1,6 @@
-package io.sbcts.route
+package io.github.alt_groovy.bus.route
 
-import io.sbcts.service.TaskService
+import io.github.alt_groovy.bus.service.TaskService
 import org.apache.camel.LoggingLevel
 import org.apache.camel.builder.RouteBuilder
 import org.apache.camel.processor.aggregate.GroupedBodyAggregationStrategy
@@ -14,9 +14,13 @@ class TaskRouteBuilder extends RouteBuilder {
     @Autowired
     protected TaskService taskService;
 
+    @Value('${server.clustered}') private String serverClustered;
     @Value('${server.task.schedules.enabled:false}') private boolean taskSchedulesEnabled;
     @Value('${camel.component.jms.request-timeout:3600000}') private long taskTimeout;
 
+    private String master(){
+        return this.serverClustered ? 'master:' : ''
+    }
 
     @Override
     public void configure() throws Exception {
@@ -90,7 +94,7 @@ class TaskRouteBuilder extends RouteBuilder {
     }
 
     public void configureLeaderElectedRoute(String fromUri, String toUri){
-        from("master:task-server:${fromUri}")
+        from("master():task-server:${fromUri}")
                 .to(toUri)
     }
 
@@ -222,7 +226,7 @@ class TaskRouteBuilder extends RouteBuilder {
 
     public void configureLeaderElectedTaskSchedule(String taskHandle, String cronTab){
         String cronTabBase64 = Base64.getUrlEncoder().encodeToString(cronTab.getBytes())
-        from("master:task-server-:quartz:${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
+        from("master():task-server-:quartz:${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
                 .routeId("${taskHandle} schedule ${cronTab}")
                 .autoStartup(taskSchedulesEnabled)
                 .setBody().constant(taskHandle)

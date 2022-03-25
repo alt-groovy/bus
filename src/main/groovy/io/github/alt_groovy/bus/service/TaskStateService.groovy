@@ -1,4 +1,4 @@
-package io.sbcts.service
+package io.github.alt_groovy.bus.service
 
 
 import org.apache.camel.ProducerTemplate

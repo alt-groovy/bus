@@ -7,10 +7,13 @@ profiles:
     activation:
       - kubeContext: minikube
         command: dev,run
-
+  - name: dependency-cache
+    build:
+      artifacts:
+        - image: gradle/dependency-cached
+          docker:
+            dockerfile: .docker/Dockerfile-gradle-7.4.1-jdk11-alpine-dependency-cached
 build:
-  tagPolicy:
-    gitCommit: { }
   artifacts:
     - image: alt-groovy/bus
       docker:

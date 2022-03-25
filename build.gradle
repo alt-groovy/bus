@@ -2,13 +2,12 @@ plugins {
     id 'org.springframework.boot' version '2.2.5.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
     id 'groovy'
-    id 'java'
 }
 
 group 'io.github.alt-groovy'
 version '1.0.0'
 
-sourceCompatibility = 1.17
+sourceCompatibility = 1.11
 
 configurations {
     developmentOnly
@@ -20,7 +19,6 @@ configurations {
 repositories {
     mavenLocal()
     mavenCentral()
-
 }
 
 dependencies {

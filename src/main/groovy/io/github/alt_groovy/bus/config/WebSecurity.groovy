@@ -1,4 +1,4 @@
-package io.sbcts.config
+package io.github.alt_groovy.bus.config
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration

@@ -1,0 +1,12 @@
+FROM gradle:7.4.1-jdk11-alpine as builder
+COPY --chown=gradle:gradle . /home/gradle/src
+WORKDIR /home/gradle/src
+
+# Honour the build VM default settings, to avoid forking the daemon
+# See https://docs.gradle.org/7.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon.
+ARG JAVA_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"
+RUN gradle build --no-daemon
+
+FROM gradle:7.4.1-jdk11-alpine
+ENV JAVA_OPTS="-Xmx512m -XX:MaxMetaspaceSize=256m"
+COPY --from=builder /root/.gradle /root/.gradle

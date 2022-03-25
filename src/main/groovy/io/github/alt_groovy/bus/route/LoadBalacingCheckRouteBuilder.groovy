@@ -1,8 +1,7 @@
-package io.sbcts.route
+package io.github.alt_groovy.bus.route
 
 
 import org.apache.camel.builder.RouteBuilder
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 

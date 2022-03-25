@@ -1,6 +1,6 @@
-package io.sbcts.web
+package io.github.alt_groovy.bus.web
 
-import io.sbcts.service.NotificationService
+import io.github.alt_groovy.bus.service.NotificationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.stereotype.Controller

@@ -1,4 +1,4 @@
-package io.sbcts.config
+package io.github.alt_groovy.bus.config
 
 
 import org.apache.activemq.artemis.core.config.ClusterConnectionConfiguration
