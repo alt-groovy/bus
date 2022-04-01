@@ -33,36 +33,36 @@ class TaskService {
 
         Map<String, Object> properties = getApplicationProperties();
 
-        def configuredSchedules = properties.keySet().findAll{ key -> key.startsWith('task.schedule.')}
-        def configuredTimers = properties.keySet().findAll{ key -> key.startsWith('task.timer.')}
-        def configuredSequences = properties.keySet().findAll{ key -> key.startsWith('task.sequence.')}
-        def configuredSets = properties.keySet().findAll{ key -> key.startsWith('task.set.')}
-        def configuredLabelGroups = properties.keySet().findAll{ key -> key.startsWith('task.label.group.')}
-        def configuredSynchronisedTasks = properties.keySet().findAll{ key -> key.startsWith('task.synchronised.')}
+        def configuredSchedules = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.schedule.')}
+        def configuredTimers = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.timer.')}
+        def configuredSequences = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.sequence.')}
+        def configuredSets = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.set.')}
+        def configuredLabelGroups = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.label.group.')}
+        def configuredSynchronisedTasks = properties.keySet().findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.synchronised.')}
         def configuredTasks = properties.keySet().findAll{ key ->
-            key.startsWith('task.') && !(key.startsWith('task.schedule.')||key.startsWith('task.timer.')||key.startsWith('task.sequence.')||key.startsWith('task.set.')||key.startsWith('task.synchronised.')||key.startsWith('task.label.group.'))
+            key.startsWith('io.github.alt_groovy.bus.service.') && !(key.startsWith('io.github.alt_groovy.bus.service.schedule.')||key.startsWith('io.github.alt_groovy.bus.service.timer.')||key.startsWith('io.github.alt_groovy.bus.service.sequence.')||key.startsWith('io.github.alt_groovy.bus.service.set.')||key.startsWith('io.github.alt_groovy.bus.service.synchronised.')||key.startsWith('io.github.alt_groovy.bus.service.label.group.'))
         }
 
         def Map taskMap = [root:[name:'root',parents:[], children:[]]]
 
 
-        setChildren(taskMap,properties,configuredLabelGroups,'task.label.group.')
-        setChildren(taskMap,properties,configuredSequences,'task.sequence.')
-        setChildren(taskMap,properties,configuredSets,'task.set.')
+        setChildren(taskMap,properties,configuredLabelGroups,'io.github.alt_groovy.bus.service.label.group.')
+        setChildren(taskMap,properties,configuredSequences,'io.github.alt_groovy.bus.service.sequence.')
+        setChildren(taskMap,properties,configuredSets,'io.github.alt_groovy.bus.service.set.')
 
-        setParents(taskMap,properties,configuredLabelGroups,'task.label.group.')
-        setParents(taskMap,properties,configuredSequences,'task.sequence.')
-        setParents(taskMap,properties,configuredSets,'task.set.')
+        setParents(taskMap,properties,configuredLabelGroups,'io.github.alt_groovy.bus.service.label.group.')
+        setParents(taskMap,properties,configuredSequences,'io.github.alt_groovy.bus.service.sequence.')
+        setParents(taskMap,properties,configuredSets,'io.github.alt_groovy.bus.service.set.')
         setOrphans(taskMap)
 
-        setType(taskMap,configuredLabelGroups,'task.label.group.','label')
-        setType(taskMap,configuredSequences,'task.sequence.','sequence')
-        setType(taskMap,configuredSets,'task.set.','set')
-        setType(taskMap,configuredSynchronisedTasks,'task.synchronised.','synchronised')
-        setType(taskMap,configuredTasks,'task.','task')
+        setType(taskMap,configuredLabelGroups,'io.github.alt_groovy.bus.service.label.group.','label')
+        setType(taskMap,configuredSequences,'io.github.alt_groovy.bus.service.sequence.','sequence')
+        setType(taskMap,configuredSets,'io.github.alt_groovy.bus.service.set.','set')
+        setType(taskMap,configuredSynchronisedTasks,'io.github.alt_groovy.bus.service.synchronised.','synchronised')
+        setType(taskMap,configuredTasks,'io.github.alt_groovy.bus.service.','task')
 
 
-        setSchedules(taskMap,properties,configuredSchedules,'task.schedule.')
+        setSchedules(taskMap,properties,configuredSchedules,'io.github.alt_groovy.bus.service.schedule.')
 
         return taskMap
     }

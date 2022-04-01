@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bus-configMap
+  namespace: default
+data:
+  zoo.servers: zookeeper-service:2888
+

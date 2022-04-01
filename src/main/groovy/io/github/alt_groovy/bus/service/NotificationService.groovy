@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class NotificationService {
-    @Value('${notifications.enabled:false}') private boolean notificationsEnabled;
+    @Value('${io.github.alt_groovy.bus.notifications.enabled:false}') private boolean notificationsEnabled;
 
     @Autowired SimpMessagingTemplate simpMessagingTemplate;
 

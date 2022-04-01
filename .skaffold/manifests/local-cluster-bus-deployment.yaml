@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bus-deployment
+  labels:
+    app: bus-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bus
+  template:
+    metadata:
+      labels:
+        app: bus
+    spec:
+      containers:
+        - name: bus-1
+          image: alt-groovy/bus
+          command: ["java",
+                    "-jar",
+                    "-Dio.github.alt_groovy.bus.zookeeper.server.port=8081",
+                    "-Dio.github.alt_groovy.bus.zookeeper.cluster.service.nodes=$ZOO_SERVERS",
+                    "-Dio.github.alt_groovy.bus.acceptor.uri=tcp://bus-service:9017",
+                    "-Dio.github.alt_groovy.bus.connector.uri=tcp://bus-service:9017,tcp://bus-service:9018",
+                    "/app/bus-1.0.0.jar"]
+          ports:
+            - containerPort: 8081
+            - containerPort: 9017
+          env:
+            - name: ZOO_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: bus-configMap
+                  key: zoo.servers
+        - name: bus-2
+          image: alt-groovy/bus
+          command: ["java",
+                    "-jar",
+                    "-Dio.github.alt_groovy.bus.zookeeper.server.port=8082",
+                    "-Dio.github.alt_groovy.bus.zookeeper.cluster.service.nodes=$ZOO_SERVERS",
+                    "-Dio.github.alt_groovy.bus.acceptor.uri=tcp://bus-service:9018",
+                    "-Dio.github.alt_groovy.bus.connector.uri=tcp://bus-service:9018,tcp://bus-service:9017",
+                    "/app/bus-1.0.0.jar"]
+          ports:
+            - containerPort: 8082
+            - containerPort: 9018
+
+          env:
+            - name: ZOO_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: bus-configMap
+                  key: zoo.servers

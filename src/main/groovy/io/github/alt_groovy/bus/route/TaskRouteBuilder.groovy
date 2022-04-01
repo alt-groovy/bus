@@ -14,12 +14,18 @@ class TaskRouteBuilder extends RouteBuilder {
     @Autowired
     protected TaskService taskService;
 
-    @Value('${server.clustered}') private String serverClustered;
-    @Value('${server.task.schedules.enabled:false}') private boolean taskSchedulesEnabled;
-    @Value('${camel.component.jms.request-timeout:3600000}') private long taskTimeout;
+
+    @Value('${ALT_GROOVY_BUS_CLUSTERED:false}') private boolean ALT_GROOVY_BUS_CLUSTERED;
+    @Value('${io.github.alt_groovy.bus.clustered:false}') private boolean clustered;
+    @Value('${io.github.alt_groovy.bus.schedules.enabled:false}') private boolean taskSchedulesEnabled;
+    @Value('${io.github.alt_groovy.bus.clustered.jms.request-timeout:3600000}') private long taskTimeout;
+
+    private boolean isclustered(){
+        return this.clustered || this.ALT_GROOVY_BUS_CLUSTERED
+    }
 
     private String master(){
-        return this.serverClustered ? 'master:' : ''
+        return this.isclustered() ? 'master:service-bus:' : ''
     }
 
     @Override
@@ -56,14 +62,14 @@ class TaskRouteBuilder extends RouteBuilder {
 
         Map<String, Object> properties = taskService.getApplicationProperties()
 
-        def configuredSchedules = properties.keySet()findAll{ key -> key.startsWith('task.schedule.')}
-        def configuredTimers = properties.keySet()findAll{ key -> key.startsWith('task.timer.')}
-        def configuredSequences = properties.keySet()findAll{ key -> key.startsWith('task.sequence.')}
-        def configuredSets = properties.keySet()findAll{ key -> key.startsWith('task.set.')}
-        def configuredLabelGroups = properties.keySet()findAll{ key -> key.startsWith('task.label.group.')}
-        def configuredSynchronisedTasks = properties.keySet()findAll{ key -> key.startsWith('task.synchronised.')}
+        def configuredSchedules = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.schedule.')}
+        def configuredTimers = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.timer.')}
+        def configuredSequences = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.sequence.')}
+        def configuredSets = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.set.')}
+        def configuredLabelGroups = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.label.group.')}
+        def configuredSynchronisedTasks = properties.keySet()findAll{ key -> key.startsWith('io.github.alt_groovy.bus.service.synchronised.')}
         def configuredTasks = properties.keySet()findAll{ key ->
-            key.startsWith('task.') && !(key.startsWith('task.timeout.')||key.startsWith('task.schedule.')||key.startsWith('task.timer.')||key.startsWith('task.sequence.')||key.startsWith('task.set.')||key.startsWith('task.synchronised.')||key.startsWith('task.label.group.'))
+            key.startsWith('io.github.alt_groovy.bus.service.') && !(key.startsWith('io.github.alt_groovy.bus.service.timeout.')||key.startsWith('io.github.alt_groovy.bus.service.schedule.')||key.startsWith('io.github.alt_groovy.bus.service.timer.')||key.startsWith('io.github.alt_groovy.bus.service.sequence.')||key.startsWith('io.github.alt_groovy.bus.service.set.')||key.startsWith('io.github.alt_groovy.bus.service.synchronised.')||key.startsWith('io.github.alt_groovy.bus.service.label.group.'))
         }
 
         configuredTasks.each{ task ->
@@ -75,33 +81,33 @@ class TaskRouteBuilder extends RouteBuilder {
         }
 
         configuredSequences.each { sequence ->
-            def String taskHandle = sequence.replace('task.sequence.','')
+            def String taskHandle = sequence.replace('io.github.alt_groovy.bus.service.sequence.','')
             def String endpointList = properties[sequence].toString().split(',').collect{ "direct://${it}"}.join(',')
             configureLoadBalancedTaskSequence(taskHandle, endpointList)
         }
 
         configuredSets.each { set ->
-            def String taskHandle = set.replace('task.set.','')
+            def String taskHandle = set.replace('io.github.alt_groovy.bus.service.set.','')
             def String endpointList = properties[set].toString().split(',').collect{ "direct://${it}"}.join(',')
             configureLoadBalancedTaskSet(taskHandle, endpointList)
         }
 
         configuredSchedules.each { schedule ->
-            def String taskHandle = schedule.replace('task.schedule.','')
+            def String taskHandle = schedule.replace('io.github.alt_groovy.bus.service.schedule.','')
             def String cronTab = properties[schedule]
             configureLeaderElectedTaskSchedule(taskHandle, cronTab)
         }
     }
 
     public void configureLeaderElectedRoute(String fromUri, String toUri){
-        from("master():task-server:${fromUri}")
+        from("${master()}${fromUri}")
                 .to(toUri)
     }
 
     public void configureTask(String task, Map properties, boolean isSynchronised = false){
         def taskDefinition = properties[task].toString()
 
-        def String taskHandle = task.replace('task.','')
+        def String taskHandle = task.replace('io.github.alt_groovy.bus.service.','')
         if (isSynchronised) {
             taskHandle = taskHandle.replace('synchronised.','')
         }
@@ -226,7 +232,7 @@ class TaskRouteBuilder extends RouteBuilder {
 
     public void configureLeaderElectedTaskSchedule(String taskHandle, String cronTab){
         String cronTabBase64 = Base64.getUrlEncoder().encodeToString(cronTab.getBytes())
-        from("master():task-server-:quartz:${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
+        from("${master()}quartz:${taskHandle}-schedule-${cronTabBase64}?cron=${cronTab}")
                 .routeId("${taskHandle} schedule ${cronTab}")
                 .autoStartup(taskSchedulesEnabled)
                 .setBody().constant(taskHandle)

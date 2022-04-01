@@ -7,6 +7,22 @@ profiles:
     activation:
       - kubeContext: minikube
         command: dev,run
+
+  - name: local-cluster
+    activation:
+      - kubeContext: minikube
+        command: dev,run
+    deploy:
+      kubectl:
+        manifests:
+          - .skaffold/manifests/local-cluster*.yaml
+    portForward:
+      - resourceType: service
+        resourceName: bus-service
+        namespace: default
+        port: 8081
+        localPort: 8081
+
   - name: dependency-cache
     build:
       artifacts:
@@ -26,5 +42,5 @@ portForward:
   - resourceType: pod
     resourceName: bus
     namespace: default
-    port: 9091
-    localPort: 9091
+    port: 8080
+    localPort: 8080

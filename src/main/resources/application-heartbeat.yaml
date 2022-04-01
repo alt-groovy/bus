@@ -1,7 +1,13 @@
-task:
-  label:
-    group:
-      SYSTEM : 'HEARTBEAT,ERROR'
-  HEARTBEAT : 'log:io.github.alt_groovy.bus?level=INFO'
-
-  ERROR : 'exec:notanexec?args=someparams'
+io:
+  github:
+    alt_groovy:
+      bus:
+        schedules:
+          enabled: false
+        service:
+            schedule:
+              Heartbeat : '0+*+8-17+?+*+MON-SUN'
+            label:
+              group:
+                System : 'Heartbeat'
+            Heartbeat : 'log:io.github.alt_groovy.bus?level=INFO'

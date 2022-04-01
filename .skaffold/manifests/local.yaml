@@ -6,5 +6,6 @@ spec:
   containers:
     - name: bus
       image: alt-groovy/bus
+      command: ["java","-jar","-Dspring.profiles.active=default","/app/bus-1.0.0.jar"]
       ports:
-        - containerPort: 9091
+        - containerPort: 8080
